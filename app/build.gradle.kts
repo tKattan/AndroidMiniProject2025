@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.androidminiproject2025"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.androidminiproject2025"
@@ -35,6 +35,8 @@ dependencies {
 
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation(libs.activity)
+    implementation(libs.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
