@@ -53,11 +53,6 @@ public class MenuActivity extends AppCompatActivity {
             return insets;
         });
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.musique_accueil);
-        mediaPlayer.setLooping(true);
-        mediaPlayer.start();
-
-
         String extra = getIntent().getStringExtra("result");
         if ("win".equals(extra)) {
             switchToResultFragment(true);
@@ -136,6 +131,14 @@ public class MenuActivity extends AppCompatActivity {
         if (mediaPlayer != null) {
             mediaPlayer.start(); // Resume music when app comes back to the foreground
         }
+    }
+
+    public MediaPlayer getMediaPlayer(){
+        return this.mediaPlayer;
+    }
+
+    public void setMediaPlayer(MediaPlayer mediaPlayer){
+        this.mediaPlayer = mediaPlayer;
     }
 
 
