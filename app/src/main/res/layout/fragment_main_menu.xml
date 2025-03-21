@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragments.MainMenuFragment"
+    tools:context=".fragments.main.MainMenuFragment"
     android:background="@color/main">
 
         <com.google.android.material.textview.MaterialTextView
@@ -21,6 +21,7 @@
             style="@style/header2"/>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/playButton"
             android:layout_height="wrap_content"
             android:layout_width="200dp"
             android:layout_gravity="center"
