@@ -5,4 +5,5 @@
     <string name="gameTitle">I LIKE TO MOVE IT</string>
     <string name="HighScore">High score : 999666</string>
     <string name="playButtonText">Play</string>
+    <string name="level">Level</string>
 </resources>

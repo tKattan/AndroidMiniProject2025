@@ -9,7 +9,7 @@ import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
 
-import com.example.androidminiproject2025.GameThread;
+import com.example.androidminiproject2025.domain.GameThread;
 
 import timber.log.Timber;
 
@@ -59,6 +59,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             canvas.drawRect(x, 100, x+100, 200, paint);
         }
     }
+
     public void update() {
         x = (x + 1) % 300;
     }
