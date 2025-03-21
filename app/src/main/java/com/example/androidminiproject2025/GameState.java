@@ -9,5 +9,6 @@ public enum GameState {
     TASK_LOST,
     GAME_WON,
     GAME_LOST,
-    GAME_ERROR
+    GAME_ERROR,
+    GAME_DONE
 }
