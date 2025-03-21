@@ -3,16 +3,16 @@ package com.example.androidminiproject2025;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 
-import androidx.annotation.Nullable;
-
 import com.example.androidminiproject2025.views.GameView;
+
+import timber.log.Timber;
 
 public class GameThread extends Thread {
 
     private boolean running;
-    private SurfaceHolder surfaceHolder;
-    private GameView gameView;
-    private Canvas canvas;
+    private final SurfaceHolder surfaceHolder;
+    private final GameView gameView;
+
     public GameThread(SurfaceHolder surfaceHolder, GameView gameView) {
         super();
         this.surfaceHolder = surfaceHolder;
@@ -23,20 +23,22 @@ public class GameThread extends Thread {
     @Override
     public void run() {
         while (running) {
-            canvas = null;
+            Canvas canvas = null;
             try {
                 canvas = this.surfaceHolder.lockCanvas();
                 synchronized(surfaceHolder) {
                     this.gameView.update();
                     this.gameView.draw(canvas);
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                Timber.e(e, "Error in GameThread");
+            }
             finally {
                 if (canvas != null) {
                     try {
                         surfaceHolder.unlockCanvasAndPost(canvas);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Timber.e(e, "Error unlocking canvas");
                     }
                 }
             }

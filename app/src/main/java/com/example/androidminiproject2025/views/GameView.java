@@ -11,9 +11,11 @@ import androidx.annotation.NonNull;
 
 import com.example.androidminiproject2025.GameThread;
 
+import timber.log.Timber;
+
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private GameThread thread;
+    private final GameThread thread;
 
     public GameView(Context context) {
         super(context);
@@ -23,23 +25,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width,
+    public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width,
                                int height) {
     }
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void surfaceCreated(@NonNull SurfaceHolder holder) {
         thread.setRunning(true);
         thread.start();
     }
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
         boolean retry = true;
         while (retry) {
             try {
                 thread.setRunning(false);
                 thread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Timber.e(e, "Error destroying thread");
             }
             retry = false;
         }
