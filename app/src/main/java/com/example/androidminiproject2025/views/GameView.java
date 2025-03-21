@@ -59,6 +59,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             canvas.drawRect(x, 100, x+100, 200, paint);
         }
     }
+
     public void update() {
         x = (x + 1) % 300;
     }
