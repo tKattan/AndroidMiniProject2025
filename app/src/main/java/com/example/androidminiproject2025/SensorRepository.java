@@ -46,15 +46,19 @@ public class SensorRepository {
                 Sensor accelerometer = sensorMan.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
                 sensorMan.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
                 Timber.d("Sensor registered");
-                while (!cancellationToken.isCancelled() && !correctInput) {
+                while (!cancellationToken.isCancelled()) {
                     //noinspection BusyWait
+                    if(correctInput){
+                        callback.onComplete(new Result.Success<>(true));
+                        return;
+                    }
                     Thread.sleep(100);
                 }
-                callback.onComplete(new Result.Success<>(true));
             } catch (Exception e) {
                 Timber.e(e, "erreur binding sensor accelerometer");
                 callback.onComplete(new Result.Error<>(e));
             }finally {
+                etalonAccelDone = false;
                 sensorMan.unregisterListener(sensorEventListener);
             }
         });
@@ -71,11 +75,13 @@ public class SensorRepository {
             try{
                 mediaRecorder.prepare();
                 mediaRecorder.start();
-                while (!cancellationToken.isCancelled() && !updateDecibelLevel(mediaRecorder)) {
-                    //noinspection BusyWait
+                while (!cancellationToken.isCancelled()) {
+                    if(updateDecibelLevel(mediaRecorder)){
+                        callback.onComplete(new Result.Success<>(true));
+                        return;
+                    }
                     Thread.sleep(200);
                 }
-                callback.onComplete(new Result.Success<>(true));
             }catch (IOException | InterruptedException e){
                 Timber.e(e, "erreur binding audio recorder");
                 callback.onComplete(new Result.Error<>(e));
@@ -123,6 +129,7 @@ public class SensorRepository {
 
     private static boolean computeAccelerometerValues(float[] values){
         if(etalonAccelDone){
+            Timber.d("Etalon values: %f, %f, %f", accelXEtalon, accelYEtalon, accelZEtalon);
             if(accelXEtalon -5 > values[0] ||accelXEtalon +5 < values[0]){
                 return true;
             }
