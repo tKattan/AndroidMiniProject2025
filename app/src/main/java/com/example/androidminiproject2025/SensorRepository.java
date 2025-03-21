@@ -51,7 +51,11 @@ public class SensorRepository {
 
                 }
                 callback.onComplete(new Result.Success<>(true));
-            } finally {
+
+            } catch (Exception e) {
+                Timber.e(e, "erreur binding sensor accelerometer");
+                callback.onComplete(new Result.Error<>(e));
+            }finally {
                 sensorMan.unregisterListener(sensorEventListener);
             }
         });
@@ -73,7 +77,8 @@ public class SensorRepository {
                 }
                 callback.onComplete(new Result.Success<>(true));
             }catch (IOException | InterruptedException e){
-                throw new RuntimeException(e);
+                Timber.e(e, "erreur binding audio recorder");
+                callback.onComplete(new Result.Error<>(e));
             } finally {
                 mediaRecorder.stop();
             }
@@ -89,7 +94,7 @@ public class SensorRepository {
             if(decibels >= 85.0){
                 return true;
             }
-            Timber.log( 1,"Sound Level: " + String.format("%.2f", decibels) + " dB");
+            Timber.i( "Sound Level: %.2f dB",  decibels);
             return false;
         }
         return false;
