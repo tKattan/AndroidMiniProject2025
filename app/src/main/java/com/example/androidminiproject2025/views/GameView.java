@@ -76,8 +76,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private void startCountdown() {
         Timber.d("Starting countdown");
         countdown = 3;
-        handler.post(countdownRunnable);
         state = GameState.COUNTDOWN;
+        handler.post(countdownRunnable);
     }
 
     // Runnable for the 3,2,1 countdown
