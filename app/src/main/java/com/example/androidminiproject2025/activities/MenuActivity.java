@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.androidminiproject2025.BuildConfig;
 import com.example.androidminiproject2025.R;
+import com.example.androidminiproject2025.fragments.ResultFragment;
 import com.example.androidminiproject2025.fragments.level.LevelSelectionFragment;
 import com.example.androidminiproject2025.fragments.main.MainMenuFragment;
 
@@ -35,7 +36,7 @@ public class MenuActivity extends AppCompatActivity {
             Timber.plant(new Timber.DebugTree());
         }
 
-        if(!allPermissionsAreGranted()) {
+        if(allPermissionsAreGranted()) {
             ActivityCompat.requestPermissions(
                     this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
@@ -48,7 +49,23 @@ public class MenuActivity extends AppCompatActivity {
             return insets;
         });
 
+        String extra = getIntent().getStringExtra("result");
+        if ("win".equals(extra)) {
+            switchToResultFragment(true);
+            return;
+        } else if ("lose".equals(extra)) {
+            switchToResultFragment(false);
+            return;
+        }
+
         switchToMainMenuFragment();
+    }
+
+    public void switchToResultFragment(boolean result) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.menu_fragment_container, new ResultFragment(result))
+                .addToBackStack(null)
+                .commit();
     }
 
     public void switchToMainMenuFragment() {
@@ -68,17 +85,17 @@ public class MenuActivity extends AppCompatActivity {
     private boolean allPermissionsAreGranted() {
         for (String permission : REQUIRED_PERMISSIONS) {
             if(ContextCompat.checkSelfPermission(getBaseContext(), permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if(!allPermissionsAreGranted()) {
+            if(allPermissionsAreGranted()) {
                 Toast.makeText(this,
                         "Permissions not granted by the user.",
                         Toast.LENGTH_SHORT).show();
