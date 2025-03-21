@@ -43,15 +43,14 @@ public class SensorRepository {
             sensorMan = (SensorManager) context.getSystemService(SENSOR_SERVICE);
             SensorEventListener sensorEventListener = getSensorEventListener();
             try {
-                PackageManager manager = context.getPackageManager();
                 Sensor accelerometer = sensorMan.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
                 sensorMan.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
-
-                while (!cancellationToken.isCancelled() || !correctInput) {
-
+                Timber.d("Sensor registered");
+                while (!cancellationToken.isCancelled() && !correctInput) {
+                    //noinspection BusyWait
+                    Thread.sleep(100);
                 }
                 callback.onComplete(new Result.Success<>(true));
-
             } catch (Exception e) {
                 Timber.e(e, "erreur binding sensor accelerometer");
                 callback.onComplete(new Result.Error<>(e));
@@ -73,6 +72,7 @@ public class SensorRepository {
                 mediaRecorder.prepare();
                 mediaRecorder.start();
                 while (!cancellationToken.isCancelled() || !updateDecibelLevel(mediaRecorder)) {
+                    //noinspection BusyWait
                     Thread.sleep(200);
                 }
                 callback.onComplete(new Result.Success<>(true));
@@ -108,6 +108,7 @@ public class SensorRepository {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                    Timber.d("Accelerometer values: %f, %f, %f", event.values[0], event.values[1], event.values[2]);
                     correctInput = computeAccelerometerValues(event.values);
                 }
             }
