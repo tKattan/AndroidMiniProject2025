@@ -22,7 +22,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         setFocusable(true);
     }
 
-
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width,
                                int height) {
@@ -47,6 +46,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private int x=0;
+
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
