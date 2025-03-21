@@ -52,6 +52,7 @@ public class GameThread extends Thread {
 
             timeTaken = System.nanoTime() - startTime;
             sleepTime = (FRAME_TIME - timeTaken) / 1000000; // convert to milliseconds
+            // Timber.d("Sleep time: %d", sleepTime);
 
             if (sleepTime > 0) {
                 try {
