@@ -7,11 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.androidminiproject2025.BuildConfig;
 import com.example.androidminiproject2025.R;
-import com.example.androidminiproject2025.fragments.MainMenuFragment;
+import com.example.androidminiproject2025.fragments.level.LevelSelectionFragment;
+import com.example.androidminiproject2025.fragments.main.MainMenuFragment;
 
 import timber.log.Timber;
 
@@ -39,8 +39,14 @@ public class MenuActivity extends AppCompatActivity {
 
     private void initializeMainFragment() {
         getSupportFragmentManager().beginTransaction()
-                .setTransition( FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
                 .replace(R.id.menu_fragment_container, new MainMenuFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
+    public void switchToLevelSelectionFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.menu_fragment_container, new LevelSelectionFragment())
                 .addToBackStack(null)
                 .commit();
     }
