@@ -53,8 +53,7 @@ public class MyintRecyclerViewAdapter extends RecyclerView.Adapter<MyintRecycler
         public void onClick(View view) {
             Context context = view.getContext();
             Intent intent = new Intent(context, GameActivity.class);
-            String value = levelNumber.getText().toString();
-            intent.putExtra("LEVEL_NUMBER", value);
+            intent.putExtra("LEVEL_NUMBER", "7000");
             context.startActivity(intent);
         }
     }
