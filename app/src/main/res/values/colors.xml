@@ -7,4 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!--https://coolors.co/edffec-61e786-5a5766-48435c-9792e3-->
+    <color name="main">#FFedffec</color>
+    <color name="second">#FF48435c</color>
+    <color name="third">#FF61e786</color>
+    <color name="fourth">#FF5a5766</color>
+    <color name="fifth">#FF9792e3</color>
 </resources>

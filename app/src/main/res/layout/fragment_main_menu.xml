@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragments.MainMenuFragment"
+    android:background="@color/main">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/gameTitle"
+            style="@style/header"/>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_marginTop="200dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/HighScore"
+            style="@style/header2"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_height="wrap_content"
+            android:layout_width="200dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="100dp"
+            android:text="@string/playButtonText"
+            style="@style/materialButton"/>
+
+
+</FrameLayout>
