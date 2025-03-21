@@ -1,6 +1,7 @@
 package com.example.androidminiproject2025.fragments.level;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.androidminiproject2025.activities.MenuActivity;
 import com.example.androidminiproject2025.databinding.FragmentLevelSelectionListBinding;
 
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ public class LevelSelectionFragment extends Fragment {
     private int mColumnCount = 1;
 
     private List<Integer> levels;
+    private MediaPlayer mediaPlayer;
 
     public LevelSelectionFragment() {
         levels = new ArrayList<>();
@@ -35,6 +38,8 @@ public class LevelSelectionFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MenuActivity menu = (MenuActivity) getActivity();
+        mediaPlayer = menu.getMediaPlayer();
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -61,5 +66,22 @@ public class LevelSelectionFragment extends Fragment {
             recyclerView.setAdapter(levelAdapter);
         }
         return binding.getRoot();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer = null;
+        }
     }
 }

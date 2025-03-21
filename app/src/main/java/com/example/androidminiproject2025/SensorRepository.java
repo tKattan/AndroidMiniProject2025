@@ -71,7 +71,7 @@ public class SensorRepository {
             try{
                 mediaRecorder.prepare();
                 mediaRecorder.start();
-                while (!cancellationToken.isCancelled() || !updateDecibelLevel(mediaRecorder)) {
+                while (!cancellationToken.isCancelled() && !updateDecibelLevel(mediaRecorder)) {
                     //noinspection BusyWait
                     Thread.sleep(200);
                 }

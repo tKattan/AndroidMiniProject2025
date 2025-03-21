@@ -2,6 +2,7 @@ package com.example.androidminiproject2025.activities;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -27,6 +28,9 @@ public class MenuActivity extends AppCompatActivity {
     private final String[] REQUIRED_PERMISSIONS = new String[]{
             Manifest.permission.RECORD_AUDIO,
     };
+
+    private MediaPlayer mediaPlayer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +40,7 @@ public class MenuActivity extends AppCompatActivity {
             Timber.plant(new Timber.DebugTree());
         }
 
-        if(allPermissionsAreGranted()) {
+        if(!allPermissionsAreGranted()) {
             ActivityCompat.requestPermissions(
                     this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
@@ -103,5 +107,39 @@ public class MenuActivity extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause(); // Pause music when app goes into the background
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mediaPlayer != null) {
+            mediaPlayer.start(); // Resume music when app comes back to the foreground
+        }
+    }
+
+    public MediaPlayer getMediaPlayer(){
+        return this.mediaPlayer;
+    }
+
+    public void setMediaPlayer(MediaPlayer mediaPlayer){
+        this.mediaPlayer = mediaPlayer;
+    }
+
 
 }
