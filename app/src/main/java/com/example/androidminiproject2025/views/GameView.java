@@ -9,7 +9,7 @@ import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
 
-import com.example.androidminiproject2025.GameThread;
+import com.example.androidminiproject2025.domain.GameThread;
 
 import timber.log.Timber;
 
