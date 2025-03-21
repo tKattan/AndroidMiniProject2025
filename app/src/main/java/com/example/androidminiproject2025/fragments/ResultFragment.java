@@ -1,5 +1,6 @@
 package com.example.androidminiproject2025.fragments;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -33,11 +34,19 @@ public class ResultFragment extends Fragment {
                              Bundle savedInstanceState) {
         binding = com.example.androidminiproject2025.databinding.FragmentResultBinding.inflate(inflater, container, false);
 
+        MenuActivity menu = (MenuActivity) getActivity();
+        MediaPlayer mediaPlayer = menu.getMediaPlayer();
+        if(mediaPlayer != null){
+            mediaPlayer.stop();
+        }
         if(hasWon) {
+            mediaPlayer = MediaPlayer.create(menu.getApplicationContext(), R.raw.gagner);
             binding.resultText.setText("You have won !");
         } else {
+            mediaPlayer = MediaPlayer.create(menu.getApplicationContext(), R.raw.perdu);
             binding.resultText.setText("You have lost !");
         }
+        mediaPlayer.start();
         intitializeBackToMainMenuButton();
         return binding.getRoot();
     }
