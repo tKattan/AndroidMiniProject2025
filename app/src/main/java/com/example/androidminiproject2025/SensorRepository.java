@@ -76,11 +76,11 @@ public class SensorRepository {
                     Thread.sleep(200);
                 }
                 callback.onComplete(new Result.Success<>(true));
-            }catch (IOException | InterruptedException e){
+            }catch (Exception e){
                 Timber.e(e, "erreur binding audio recorder");
                 callback.onComplete(new Result.Error<>(e));
             } finally {
-                mediaRecorder.stop();
+                mediaRecorder.release();
             }
         });
     }

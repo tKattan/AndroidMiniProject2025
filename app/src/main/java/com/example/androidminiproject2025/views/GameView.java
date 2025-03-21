@@ -15,8 +15,10 @@ import androidx.annotation.NonNull;
 import com.example.androidminiproject2025.CancellationToken;
 import com.example.androidminiproject2025.Result;
 import com.example.androidminiproject2025.SensorRepository;
+import com.example.androidminiproject2025.Tasks;
 import com.example.androidminiproject2025.activities.MenuActivity;
 import com.example.androidminiproject2025.domain.GameThread;
+import com.example.androidminiproject2025.GameState;
 
 import timber.log.Timber;
 
@@ -25,17 +27,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private final GameThread thread;
     private final SensorRepository sensorRepository;
     private final Handler handler;
+    private final int taskCountdownTime;
+
     private CancellationToken cancellationToken;
-    private String text = "";
 
+    private Tasks[] tasks = new Tasks[]{Tasks.MOVEMENT, Tasks.BLOW, Tasks.MOVEMENT, Tasks.MOVEMENT, Tasks.BLOW};
+
+    private GameState state = GameState.GAME_START;
     private int countdown = 3;
+    private int currentTask = 0;
 
-    public GameView(Context context) {
+    public GameView(Context context, int taskCountdownTime) {
         super(context);
         getHolder().addCallback(this);
         sensorRepository = new SensorRepository(context);
         handler = new Handler(Looper.getMainLooper());
         thread = new GameThread(getHolder(), this);
+        this.taskCountdownTime = taskCountdownTime;
         setFocusable(true);
     }
 
@@ -48,7 +56,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         thread.setRunning(true);
         thread.start();
         Timber.d("Thread started");
-        startCountdown();
+        state = GameState.GAME_START;
     }
     @Override
     public void surfaceDestroyed(@NonNull SurfaceHolder holder) {
@@ -69,6 +77,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Timber.d("Starting countdown");
         countdown = 3;
         handler.post(countdownRunnable);
+        state = GameState.COUNTDOWN;
     }
 
     // Runnable for the 3,2,1 countdown
@@ -80,37 +89,66 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 countdown--;
                 handler.postDelayed(this, 1000);
             } else {
-                text = "Move device";
-                handler.postDelayed(GameView.this::startTimer, 1000);
+                endCountdown();
             }
         }
     };
 
-    private void startTimer() {
+    private void endCountdown(){
+        state = GameState.TASK_LOADING;
+    }
+
+    private void loadTask() {
         Timber.d("Starting timer for checking movement");
         cancellationToken = new CancellationToken();
-        handler.postDelayed(this::endTimer, 10000); // 10 seconds timer
-        sensorRepository.checkIfMovementIsGood("x", this::onMovementChecked, cancellationToken);
+        handler.postDelayed(this::endTimer, taskCountdownTime); // timer to lose
+
+        switch(tasks[currentTask]){
+            case MOVEMENT:
+                Timber.d("Starting movement task");
+                sensorRepository.checkIfMovementIsGood(null, this::onMovementChecked, cancellationToken);
+                break;
+            case TAP:
+                break;
+            case BLOW:
+                Timber.d("Starting blow task");
+                sensorRepository.checkIfMicrophoneInputIsGood(null, this::onMicCheck, cancellationToken);
+                break;
+        }
+
+        state = GameState.TASK_IN_PROGRESS;
+        Timber.d("Task loaded");
     }
 
     private void endTimer() {
         Timber.d("Timer ended, cancelling movement check");
         cancellationToken.cancel();
-        getContext().startActivity(new Intent(getContext(), MenuActivity.class).putExtra("result", "lose"));
+        state = GameState.TASK_LOST;
     }
 
     private void onMovementChecked(Result<Boolean> result) {
         Timber.d("Movement checked received");
         if (result instanceof Result.Success) {
-            boolean isGoodMovement = ((Result.Success<Boolean>) result).data;
-            if (isGoodMovement) {
+            if (((Result.Success<Boolean>) result).data) {
                 handler.removeCallbacksAndMessages(null);
-                // Toast.makeText(getContext(), "Great job!", Toast.LENGTH_SHORT).show();
-                text = "Great job!";
-                getContext().startActivity(new Intent(getContext(), MenuActivity.class).putExtra("result", "win"));
+                state = GameState.TASK_WON;
             }
         }else{
+            state = GameState.GAME_ERROR;
             Timber.e(((Result.Error<?>) result).exception, "Error checking movement");
+        }
+    }
+
+    private void onMicCheck(Result<Boolean> result) {
+        Timber.d("Mic checked received");
+        if (result instanceof Result.Success) {
+            if (((Result.Success<Boolean>) result).data) {
+                handler.removeCallbacksAndMessages(null);
+                state = GameState.TASK_WON;
+            }
+        }else{
+            state = GameState.GAME_ERROR;
+            Timber.e(((Result.Error<?>) result).exception, "Error checking microphone");
         }
     }
 
@@ -126,11 +164,40 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             if (countdown > 0) {
                 canvas.drawText(String.valueOf(countdown), (float) getWidth() / 2, (float) getHeight() / 2, paint);
             } else {
-                canvas.drawText(text, (float) getWidth() / 2, (float) getHeight() / 2, paint);
+                canvas.drawText(tasks[currentTask].toString(), (float) getWidth() / 2, (float) getHeight() / 2, paint);
             }
         }
     }
 
     public void update() {
+        // Timber.d("Current state: %s", state);
+        switch (state){
+            case GAME_START:
+                startCountdown();
+                break;
+            case COUNTDOWN:
+            case TASK_IN_PROGRESS:
+                break;
+            case TASK_LOADING: // Choose the task, start the timer and check the
+                loadTask();
+                break;
+            case TASK_WON:
+                currentTask++;
+                if(currentTask < tasks.length){
+                    state = GameState.TASK_LOADING;
+                }else{
+                    state = GameState.GAME_WON;
+                }
+                break;
+            case TASK_LOST:
+                state = GameState.GAME_LOST;
+                break;
+            case GAME_LOST:
+                getContext().startActivity(new Intent(getContext(), MenuActivity.class).putExtra("result", "lose"));
+                break;
+            case GAME_WON:
+                getContext().startActivity(new Intent(getContext(), MenuActivity.class).putExtra("result", "win"));
+                break;
+        }
     }
 }

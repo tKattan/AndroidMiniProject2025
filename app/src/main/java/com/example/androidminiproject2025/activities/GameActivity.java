@@ -11,7 +11,8 @@ public class GameActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        setContentView(new GameView(this));
+        String levelNumber = getIntent().getStringExtra("LEVEL_NUMBER");
+        assert levelNumber != null;
+        setContentView(new GameView(this, Integer.parseInt(levelNumber)));
     }
 }
