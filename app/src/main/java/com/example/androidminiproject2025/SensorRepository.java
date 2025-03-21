@@ -3,7 +3,6 @@ package com.example.androidminiproject2025;
 import static android.content.Context.SENSOR_SERVICE;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,7 +11,6 @@ import android.media.MediaRecorder;
 
 import androidx.annotation.NonNull;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -82,11 +80,11 @@ public class SensorRepository {
                     }
                     Thread.sleep(200);
                 }
-            }catch (IOException | InterruptedException e){
+            }catch (Exception e){
                 Timber.e(e, "erreur binding audio recorder");
                 callback.onComplete(new Result.Error<>(e));
             } finally {
-                mediaRecorder.stop();
+                mediaRecorder.release();
             }
         });
     }

@@ -14,11 +14,14 @@ public class GameActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        String levelNumber = getIntent().getStringExtra("LEVEL_NUMBER");
+        assert levelNumber != null;
+
         mediaPlayer = MediaPlayer.create(this, R.raw.musique_jeu);
         mediaPlayer.setLooping(true);
         mediaPlayer.start();
 
-        setContentView(new GameView(this));
+        setContentView(new GameView(this, Integer.parseInt(levelNumber)));
     }
 
     @Override
