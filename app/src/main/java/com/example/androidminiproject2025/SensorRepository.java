@@ -8,11 +8,15 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaRecorder;
 
 import androidx.annotation.NonNull;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import timber.log.Timber;
 
 public class SensorRepository {
 
@@ -31,8 +35,10 @@ public class SensorRepository {
     private static boolean etalonAccelDone = false;
 
 
+
     public void checkIfMovementIsGood(String difficulty, RepositoryCallback<Boolean> callback, CancellationToken cancellationToken) {
         executorService.execute(() -> {
+            correctInput = false;
             SensorManager sensorMan;
             sensorMan = (SensorManager) context.getSystemService(SENSOR_SERVICE);
             SensorEventListener sensorEventListener = getSensorEventListener();
@@ -49,6 +55,44 @@ public class SensorRepository {
                 sensorMan.unregisterListener(sensorEventListener);
             }
         });
+    }
+
+    public void checkIfMicrophoneInputIsGood(String difficulty, RepositoryCallback<Boolean> callback, CancellationToken cancellationToken) {
+        executorService.execute(() -> {
+            correctInput = false;
+            MediaRecorder mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mediaRecorder.setOutputFile("/dev/null");  // Discard recorded audio
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            try{
+                mediaRecorder.prepare();
+                mediaRecorder.start();
+                while (!cancellationToken.isCancelled() || !updateDecibelLevel(mediaRecorder)) {
+                    Thread.sleep(200);
+                }
+                callback.onComplete(new Result.Success<>(true));
+            }catch (IOException | InterruptedException e){
+                throw new RuntimeException(e);
+            } finally {
+                mediaRecorder.stop();
+            }
+        });
+    }
+
+    private boolean updateDecibelLevel(MediaRecorder mediaRecorder) {
+        if(mediaRecorder != null){
+            double amplitude = mediaRecorder.getMaxAmplitude();
+            System.out.println(amplitude);
+            double decibels = 20 * Math.log10(amplitude == 0 ? 1 : amplitude);
+
+            if(decibels >= 85.0){
+                return true;
+            }
+            Timber.log( 1,"Sound Level: " + String.format("%.2f", decibels) + " dB");
+            return false;
+        }
+        return false;
     }
 
 
