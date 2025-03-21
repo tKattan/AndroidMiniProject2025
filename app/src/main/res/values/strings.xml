@@ -6,4 +6,5 @@
     <string name="HighScore">High score : 999666</string>
     <string name="playButtonText">Play</string>
     <string name="level">Level</string>
+    <string name="HINT_task_number">Task number</string>
 </resources>

@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Looper;
+import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.os.Handler;
@@ -17,6 +18,7 @@ import com.example.androidminiproject2025.Result;
 import com.example.androidminiproject2025.SensorRepository;
 import com.example.androidminiproject2025.Tasks;
 import com.example.androidminiproject2025.activities.MenuActivity;
+import com.example.androidminiproject2025.activities.GameActivity;
 import com.example.androidminiproject2025.domain.GameThread;
 import com.example.androidminiproject2025.GameState;
 
@@ -30,6 +32,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private final int taskCountdownTime;
 
     private CancellationToken cancellationToken;
+    private GameActivity activity;
 
     private final Tasks[] tasks = new Tasks[]{Tasks.MOVEMENT, Tasks.MOVEMENT, Tasks.MOVEMENT};
 
@@ -44,6 +47,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         handler = new Handler(Looper.getMainLooper());
         thread = new GameThread(getHolder(), this);
         this.taskCountdownTime = taskCountdownTime;
+        setFocusable(true);
+    }
+    public GameView(Context context, GameActivity activity) {
+        super(context);
+        getHolder().addCallback(this);
+        thread = new GameThread(getHolder(), this);
+        this.activity = activity;
+        setFocusable(true);
+    }
+    public GameView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        getHolder().addCallback(this);
+        thread = new GameThread(getHolder(), this);
         setFocusable(true);
     }
 
