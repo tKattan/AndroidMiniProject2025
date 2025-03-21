@@ -31,7 +31,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     private CancellationToken cancellationToken;
 
-    private Tasks[] tasks = new Tasks[]{Tasks.MOVEMENT, Tasks.BLOW, Tasks.MOVEMENT, Tasks.MOVEMENT, Tasks.BLOW};
+    private final Tasks[] tasks = new Tasks[]{Tasks.MOVEMENT, Tasks.MOVEMENT, Tasks.MOVEMENT};
 
     private GameState state = GameState.GAME_START;
     private int countdown = 3;
@@ -197,6 +197,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 break;
             case GAME_WON:
                 getContext().startActivity(new Intent(getContext(), MenuActivity.class).putExtra("result", "win"));
+                break;
+            case GAME_ERROR:
+                getContext().startActivity(new Intent(getContext(), MenuActivity.class).putExtra("result", "error"));
                 break;
         }
     }

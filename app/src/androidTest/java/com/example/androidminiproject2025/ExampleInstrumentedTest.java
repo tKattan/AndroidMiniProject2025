@@ -111,6 +111,13 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            if (appContext.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                InstrumentationRegistry.getInstrumentation().getUiAutomation().executeShellCommand(
+                    "pm grant " + appContext.getPackageName() + " android.permission.RECORD_AUDIO");
+            }
+        }
+
         PackageManager manager = appContext.getPackageManager();
         MediaRecorder mediaRecorder = new MediaRecorder();
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -121,6 +128,7 @@ public class ExampleInstrumentedTest {
             mediaRecorder.prepare();
             mediaRecorder.start();
             while (!updateDecibelLevel(mediaRecorder)) {
+                //noinspection BusyWait
                 Thread.sleep(200);
             }
             System.out.println("YYYYEEESSSS");
