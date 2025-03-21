@@ -5,20 +5,21 @@ import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
 import android.os.Looper;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.os.Handler;
 
 import androidx.annotation.NonNull;
 
 import com.example.androidminiproject2025.CancellationToken;
+import com.example.androidminiproject2025.GameState;
 import com.example.androidminiproject2025.Result;
 import com.example.androidminiproject2025.SensorRepository;
 import com.example.androidminiproject2025.Tasks;
+import com.example.androidminiproject2025.activities.GameActivity;
 import com.example.androidminiproject2025.activities.MenuActivity;
 import com.example.androidminiproject2025.domain.GameThread;
-import com.example.androidminiproject2025.GameState;
 
 import timber.log.Timber;
 
@@ -30,6 +31,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private final int taskCountdownTime;
 
     private CancellationToken cancellationToken;
+    private GameActivity activity;
 
     private final Tasks[] tasks = new Tasks[]{Tasks.MOVEMENT, Tasks.MOVEMENT, Tasks.MOVEMENT};
 
@@ -46,6 +48,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         this.taskCountdownTime = taskCountdownTime;
         setFocusable(true);
     }
+    public GameView(Context context, GameActivity activity, int taskCountdownTime) {
+        super(context);
+        this.taskCountdownTime = taskCountdownTime;
+        getHolder().addCallback(this);
+        sensorRepository = new SensorRepository(context);
+        thread = new GameThread(getHolder(), this);
+        this.activity = activity;
+        handler = new Handler(Looper.getMainLooper());
+        setFocusable(true);
+    }
+
 
     @Override
     public void surfaceChanged(@NonNull SurfaceHolder holder, int format, int width,
@@ -99,18 +112,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void loadTask() {
+        activity.updateTaskNumber(currentTask+1);
         Timber.d("Starting timer for checking movement");
         cancellationToken = new CancellationToken();
         handler.postDelayed(this::endTimer, taskCountdownTime); // timer to lose
 
         switch(tasks[currentTask]){
             case MOVEMENT:
-                Timber.d("Starting movement task");
+//                Timber.d("Starting movement task");
+                this.activity.showTask(Tasks.MOVEMENT);
                 sensorRepository.checkIfMovementIsGood(null, this::onMovementChecked, cancellationToken);
                 break;
             case TAP:
+//                this.activity.showTask(Tasks.TAP);
                 break;
             case BLOW:
+                this.activity.showTask(Tasks.BLOW);
                 Timber.d("Starting blow task");
                 sensorRepository.checkIfMicrophoneInputIsGood(null, this::onMicCheck, cancellationToken);
                 break;
@@ -177,6 +194,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 break;
             case COUNTDOWN:
             case TASK_IN_PROGRESS:
+            case GAME_DONE:
                 break;
             case TASK_LOADING: // Choose the task, start the timer and check the
                 loadTask();
@@ -193,9 +211,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 state = GameState.GAME_LOST;
                 break;
             case GAME_LOST:
+                state = GameState.GAME_DONE;
                 getContext().startActivity(new Intent(getContext(), MenuActivity.class).putExtra("result", "lose"));
                 break;
             case GAME_WON:
+                state = GameState.GAME_DONE;
                 getContext().startActivity(new Intent(getContext(), MenuActivity.class).putExtra("result", "win"));
                 break;
             case GAME_ERROR:
