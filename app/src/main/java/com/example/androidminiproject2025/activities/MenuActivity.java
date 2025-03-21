@@ -34,10 +34,10 @@ public class MenuActivity extends AppCompatActivity {
             return insets;
         });
 
-        initializeMainFragment();
+        switchToMainMenuFragment();
     }
 
-    private void initializeMainFragment() {
+    public void switchToMainMenuFragment() {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.menu_fragment_container, new MainMenuFragment())
                 .addToBackStack(null)
